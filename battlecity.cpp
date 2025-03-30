@@ -719,17 +719,33 @@ public:
             map[row][0] = 1;
             map[row][MAP_COLS - 1] = 1;
         }
-
-        map[5][4] = 2;
-        map[5][3] = 2;
-        map[5][7] = 2;
-        map[8][10] = 2;
-        map[8][11] = 2;
-        map[8][12] = 2;
+        map[3][8] = 2;
+        map[3][9] = 2;
+        map[3][12] = 2;
         map[3][15] = 2;
-        map[4][15] = 2;
-        map[5][15] = 2;
-        map[13][9] = 2;
+        map[5][4] = 2;
+        map[5][5] = 2;
+        map[6][4] = 2;
+        map[7][9] = 2;
+        map[7][12] = 2;
+        map[9][4] = 2;
+        map[9][5] = 2;
+        map[9][14] = 2;
+        map[10][8] = 2;
+        map[11][8] = 2;
+        map[12][5] = 2;
+        map[12][6] = 2;
+        map[12][7] = 2;
+        map[12][8] = 2;
+        map[12][12] = 2;
+        map[13][12] = 2;
+        map[14][15] = 2;
+        map[14][16] = 2;
+        map[15][5] = 2;
+        map[15][16] = 2;
+        map[16][10] = 2;
+        map[16][16] = 2;
+
 
         for (int row = 0; row < MAP_ROWS; ++row) {
             for (int col = 0; col < MAP_COLS; ++col) {
@@ -743,14 +759,11 @@ public:
     }
     bool isValidSpawn(int x, int y) {
     SDL_Rect rect = {x, y, GRID_SIZE, GRID_SIZE};
-
     for (const auto& wall : walls) {
         if (SDL_HasIntersection(&rect, &wall)) return false;
     }
-
     if (player1 && SDL_HasIntersection(&rect, &player1->rect)) return false;
     if (player2 && SDL_HasIntersection(&rect, &player2->rect)) return false;
-
     return true;
 }
 void generateEnemies() {
@@ -768,7 +781,6 @@ void generateEnemies() {
                 break;
             }
         }
-
         if (validSpawn) {
             PlayerTank* target = (rand() % 2 == 0 || !player2) ? player1 : player2;
             enemies.push_back(new EnemyTank(renderer, x, y, target, shootSound, explosionSound));
