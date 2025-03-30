@@ -64,7 +64,7 @@ public:
         if (texture) {
             SDL_RenderCopy(renderer, texture, nullptr, &rect);
         } else {
-            // Fallback to colored rectangles if texture is missing
+
             switch (type) {
                 case POWERUP_HEALTH: SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255); break;
                 case POWERUP_FREEZE: SDL_SetRenderDrawColor(renderer, 0, 255, 255, 255); break;
@@ -128,13 +128,13 @@ class PlayerTank {
 public:
     SDL_Renderer* renderer;
     std::vector<Bullet> bullets;
-    int direction; // 0: up, 1: left, 2: down, 3: right
+    int direction;
     bool alive;
     float x, y;
     float speed;
     const int width = GRID_SIZE;
     const int height = GRID_SIZE;
-    bool keys[4]; // up, left, down, right
+    bool keys[4];
     bool invincible;
     Uint32 invincibleEndTime;
     const int maxHealth = 1000;
@@ -227,24 +227,23 @@ public:
         float newX = x;
         float newY = y;
 
-        if (keys[0]) { // Up
+        if (keys[0]) {
             newY -= speed;
             direction = 0;
         }
-        if (keys[2]) { // Down
+        if (keys[2]) {
             newY += speed;
             direction = 2;
         }
-        if (keys[1]) { // Left
+        if (keys[1]) {
             newX -= speed;
             direction = 1;
         }
-        if (keys[3]) { // Right
+        if (keys[3]) {
             newX += speed;
             direction = 3;
         }
 
-        // Kiểm tra va chạm
         SDL_Rect newRect = {static_cast<int>(newX), static_cast<int>(newY), width, height};
         bool canMove = true;
 
@@ -266,7 +265,6 @@ public:
             rect.y = static_cast<int>(y);
         }
 
-        // Giới hạn trong màn hình
         if (rect.x < 0) rect.x = x = 0;
         if (rect.y < 0) rect.y = y = 0;
         if (rect.x > SCREEN_WIDTH - width) rect.x = x = SCREEN_WIDTH - width;
@@ -387,12 +385,11 @@ public:
     void update(std::vector<SDL_Rect>& walls, std::vector<bool>& wallBreakable) {
         if (!alive || frozen) return;
 
-    // Kiểm tra nếu target không tồn tại hoặc đã chết
     if (!target || !target->alive) {
-        // Nếu không có target, di chuyển ngẫu nhiên
+
         moveTimer++;
         if (moveTimer >= moveDuration) {
-            direction = rand() % 4; // Chọn hướng ngẫu nhiên
+            direction = rand() % 4;
             moveTimer = 0;
         }
         move(direction, walls);
@@ -747,35 +744,25 @@ public:
     bool isValidSpawn(int x, int y) {
     SDL_Rect rect = {x, y, GRID_SIZE, GRID_SIZE};
 
-    // Kiểm tra va chạm với tường
     for (const auto& wall : walls) {
         if (SDL_HasIntersection(&rect, &wall)) return false;
     }
 
-    // Kiểm tra va chạm với người chơi
     if (player1 && SDL_HasIntersection(&rect, &player1->rect)) return false;
     if (player2 && SDL_HasIntersection(&rect, &player2->rect)) return false;
 
     return true;
 }
 void generateEnemies() {
-    // Xóa quân địch cũ
     for (auto enemy : enemies) delete enemy;
     enemies.clear();
-
-    // Số lượng quân địch tăng theo wave (ví dụ: wave 1 = 2 quân, wave 2 = 3 quân,...)
     int enemiesToSpawn = std::min(10, 1 + (waveNumber / 2));
-
-    // Spawn quân địch ngẫu nhiên trên map
     for (int i = 0; i < enemiesToSpawn; i++) {
         int x, y;
         bool validSpawn = false;
-
-        // Thử tìm vị trí spawn hợp lệ trong tối đa 100 lần
         for (int attempt = 0; attempt < 100; attempt++) {
-            x = (rand() % (MAP_COLS - 2)) * GRID_SIZE + GRID_SIZE;  // Không spawn ở biên
+            x = (rand() % (MAP_COLS - 2)) * GRID_SIZE + GRID_SIZE;
             y = (rand() % (MAP_ROWS - 2)) * GRID_SIZE + GRID_SIZE;
-
             if (isValidSpawn(x, y)) {
                 validSpawn = true;
                 break;
@@ -788,7 +775,6 @@ void generateEnemies() {
         }
     }
 }
-
     void checkWaveCompletion() {
         if (enemies.empty()) {
             waveNumber++;
@@ -1109,8 +1095,6 @@ void generateEnemies() {
                 if (player2) player2->render(false);
                 for (auto enemy : enemies) enemy->render();
                 powerUp.render(renderer);
-
-                // Hiển thị điểm và wave
                 SDL_Color white = {255, 255, 255, 255};
                 char scoreStr[50];
                 sprintf(scoreStr, "Score: %d", score);
